@@ -28,12 +28,14 @@ class Tweetretriever:
         tweets = []
         q = f"{handle} since:{self.start_date} until:{self.end_date} list:{list_id}"
 
-        async for tweet in self.api.search(q, limit=1000):
+        async for tweet in self.api.search(q, limit=5000):
             tweets.append({
                 "datetime": tweet.date, 
                 "club_handle": tweet.user.username,
                 "tweet_id": tweet.id,
-                "tweet": tweet.rawContent
+                "tweet": tweet.rawContent,
+                "user_location": tweet.user.location,
+                "place": tweet.place
             })
 
         return pd.DataFrame(tweets)
@@ -55,3 +57,17 @@ class Tweetretriever:
             all_club_tweets = pd.concat([all_club_tweets, club_tweets])
             print(f"{club_tweets.shape[0]} tweets added for {club_handle}")
 
+    async def get_tweet_reply(self):
+        # GET USER GEOLOCATION; either tweet.place or tweet.user.location
+        pass
+
+    async def save_all_tweet_replies(self):
+        pass
+
+if __name__ == "__main__":
+    club_info = pd.read_csv("ACCOUNTS.csv")
+    retreiver = Tweetretriever(club_info=club_info,
+                               start_date="2023-08-11",
+                               end_date="2024-05-19",
+                               save_filepath="TESTING.csv")
+    retreiver
