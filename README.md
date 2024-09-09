@@ -50,3 +50,10 @@ I have chosen to use EPL fan comments from Twitter as my space of examination fo
 1. Extension of Govindarajan et al. - how does intergroup bias change as in-game events occur? E.g., are there variations in expressions of bias when the in-group team is winning vs losing?
     * Are these findings comparable to that of Govindarajan et al.? As in, are their findings generalizable to more sports and a wider or different demographic?
 2. With consideration of subquestion 1, are there also variations in how members of varying cultures express intergroup bias?
+
+---
+
+### Technical approach
+
+1. Scrape parent tweets
+2. Filter parent tweets to only contain in-game tweets - this requires obtaining each team's game datetimes, and ensuring datetimes from both the schedule and tweets are in the same timezone
