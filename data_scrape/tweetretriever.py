@@ -60,13 +60,6 @@ class Tweetretriever:
         all_club_tweets.to_csv(self.save_filepath, index=False)
         print(f"Tweets for {self.club_handles} saved to {self.save_filepath}")
 
-    async def get_tweet_reply(self):
-        # GET USER GEOLOCATION; either tweet.place or tweet.user.location
-        pass
-
-    async def save_all_tweet_replies(self):
-        pass
-
 if __name__ == "__main__":
     club_info = pd.read_csv("/home/jasmine/PROJECTS/research/data_scrape/ACCOUNTS.csv")
     retriever = Tweetretriever(club_info=club_info,

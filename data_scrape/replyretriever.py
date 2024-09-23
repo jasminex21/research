@@ -9,12 +9,14 @@ from twscrape.logger import set_log_level
 class Replyretriever:
 
     def __init__(self, 
-                 parent_tweets_df):
+                 parent_tweets_df,
+                 save_filename="REPLIES.csv"):
         
         self.api = API()
         
         self.tweet_ids = parent_tweets_df["tweet_id"]
         self.report_ids = [self._get_report_id(rep_id) for rep_id in parent_tweets_df["match_report"]]
+        self.save_filename = save_filename
 
     def _get_report_id(self, report_url):
 
@@ -25,7 +27,7 @@ class Replyretriever:
         tweet_replies = []
 
         async for tweet in self.api.tweet_replies(twid=tweet_id, 
-                                                  limit=1000,
+                                                  limit=-1,
                                                   kv={"includePromotedContent": False}):
 
             tweet_replies.append({
@@ -33,6 +35,8 @@ class Replyretriever:
                 "tweet": tweet.rawContent,
                 "id": tweet.id,
                 "user_handle": tweet.user.username,
+                "created": tweet.user.created,
+                "lang": tweet.lang,
                 "likes": tweet.likeCount,
                 "place": tweet.place,
                 "coords": tweet.coordinates,
@@ -56,21 +60,22 @@ class Replyretriever:
             tweet_replies["parent_tweet_id"] = tweet_id
             all_replies.append(tweet_replies)
 
-            print(f"{tweet_replies.shape[0]} replies added for tweet {tweet_id}")
+            print(f"{i}: {tweet_replies.shape[0]} replies added for tweet {tweet_id}")
 
             if i % 500 == 0: 
-                print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}: Pausing for 150 seconds...")
-                await asyncio.sleep(150)
+                print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}: Replies to {i} tweets scraped")
+                # await asyncio.sleep(150)
         
         all_replies = pd.concat(all_replies)
-        all_replies.to_csv("REPLIES.csv", index=False)
-        print(f"COMPLETED: {all_replies.shape[0]} replies added to REPLIES.csv")
+        all_replies.to_csv(self.save_filename, index=False)
+        print(f"COMPLETED: {all_replies.shape[0]} replies added to {self.save_filename}")
 
 if __name__ == "__main__":
 
     parent_tweets = pd.read_csv("/home/jasmine/PROJECTS/research/data_scrape/PARENT_TWEETS_FILTERED.csv")
-    # parent_tweets = parent_tweets[parent_tweets["tweet_id"].isin([1790501124497080569, 1790498047715086687])]
-    retriever = Replyretriever(parent_tweets_df=parent_tweets)
+    # parent_tweets = parent_tweets[parent_tweets["tweet_id"].isin([1779508089990857018, 1776640282341081584, 1790484554513306039, 1789285637968834683])]
+    retriever = Replyretriever(parent_tweets_df=parent_tweets, 
+                               save_filename="REPLIES_W_LANG.csv")
 
     asyncio.run(retriever.save_all_replies())
 
